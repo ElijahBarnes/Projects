@@ -34,4 +34,4 @@ for x in range (-50,50):
 pl.imshow(E_mag,origin="lower",extent = [0,100,0,100])
 pl.figure()
 pl.imshow(E_dir,origin="lower",extent = [0,100,0,100])
-
+pl.show()

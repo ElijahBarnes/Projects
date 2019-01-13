@@ -38,5 +38,6 @@ for z in np.arange(.1,10,.1):
     
 Z = np.arange(.1,10,.1)
 py.plot(Z,F)
+py.show()
  
 
