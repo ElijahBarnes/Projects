@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Nov  7 15:40:39 2017
+
+@author: elijahbarnes
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct 18 15:05:02 2017
+
+@author: elijahbarnes
+"""
+import numpy as np
+import pylab as py
+import multiprocessing
+import time
+
+a = 0
+b = 1000
+N = 10000
+h = (b-a)/N
+pi = np.pi
+g = 9.8
+L = 9.8
+Omega = 2/3
+q = 1/2
+F_d = 1.2
+E = 1e-6
+m = 1
+theta = .2
+theta_2 = .2 + E
+omega = 0
+omega_2 = 0
+t_pts = np.arange(a,b,h)
+theta_pts = []
+omega_pts = []
+theta_2_pts = []
+omega_2_pts = []
+Log_theta_pts = []
+thetas = []
+omegas = []
+def F_1(theta,omega,t):
+    return omega
+def F_2(theta,omega,t):
+    return (-g/L)*np.sin(theta)-q*omega+F_d*np.sin(Omega*t)
+def Log(theta,theta_2,omega,omega_2):
+    for t in t_pts:
+       theta_pts.append (theta)
+       omega_pts.append (omega)
+       theta_2_pts.append (theta_2)
+       omega_2_pts.append (omega_2)
+       
+       x = np.log(np.abs(theta-theta_2))
+       Log_theta_pts.append (x)
+       
+       k1 = h*F_1(theta,omega,t)
+       l1 = h*F_2(theta,omega,t)
+       k2 = h*F_1(theta+k1/2,omega+l1/2,t+h/2)
+       l2 = h*F_2(theta+k1/2,omega+l1/2,t+h/2)
+       k3 = h*F_1(theta+k2/2,omega+l2/2,t+h/2)
+       l3 = h*F_2(theta+k2/2,omega+l2/2,t+h/2)
+       k4 = h*F_1(theta+k3,omega+l3,t+h)
+       l4 = h*F_2(theta+k3,omega+l3,t+h)
+       
+       theta+= (k1+2*k2+2*k3+k4)/6
+       omega+= (l1+2*l2+2*l3+l4)/6
+       
+       if theta < -np.pi:
+            theta = theta + 2*np.pi
+       if theta > np.pi:
+            theta = theta-2*np.pi
+       
+       k1 = h*F_1(theta_2,omega_2,t)
+       l1 = h*F_2(theta_2,omega_2,t)
+       k2 = h*F_1(theta_2+k1/2,omega_2+l1/2,t+h/2)
+       l2 = h*F_2(theta_2+k1/2,omega_2+l1/2,t+h/2)
+       k3 = h*F_1(theta_2+k2/2,omega_2+l2/2,t+h/2)
+       l3 = h*F_2(theta_2+k2/2,omega_2+l2/2,t+h/2)
+       k4 = h*F_1(theta_2+k3,omega_2+l3,t+h)
+       l4 = h*F_2(theta_2+k3,omega_2+l3,t+h)
+       
+       theta_2+= (k1+2*k2+2*k3+k4)/6
+       omega_2+= (l1+2*l2+2*l3+l4)/6
+       
+       if theta_2 < -np.pi:
+            theta_2 = theta_2 + 2*np.pi
+       if theta_2 > np.pi:
+            theta_2 = theta_2-2*np.pi
+         
+    return (Log_theta_pts,theta_pts,theta_2_pts,omega_pts,omega_2_pts)
+
+if __name__ == '__main__': 
+    print(multiprocessing.cpu_count())
+    t_start = time.time()
+    theta_entries = np.random.uniform(0.2,0.21,100)
+    cores = multiprocessing.Pool()
+    results = cores.map(Log(2,2+E,0,0)[0], theta_entries)
+    cores.close()
+    cores.join()
+    print("This took {} seconds".format(time.time() - t_start)) 
+
+results = np.sum(np.array(results),axis = 0)/len(theta_entries)
+
+m,b = np.polyfit(t_pts[400:2000],results[400:2000],1)
+
+print ("The Lyapunov exponent is ", m)
+
+py.plot(t_pts[400:2000],results[400:2000])
+py.plot(t_pts[400:2000],m*t_pts[400:2000]+b)
+py.show
+py.figure()
+py.plot(t_pts,results)
+py.plot(t_pts, m*t_pts+b)
+py.show
+    

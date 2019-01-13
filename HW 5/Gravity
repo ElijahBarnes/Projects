@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Nov  6 19:24:06 2017
+
+@author: elijahbarnes
+"""
+
+import numpy as np
+import matplotlib.pyplot as py
+pi = np.pi
+
+MG = 4*pi*pi
+h  = 1e-4
+t_pts = np.arange(0,5,h)
+
+def F_1(vx):
+    return vx
+def F_2(vy):
+    return vy
+def F_3(x,y):
+    return (-MG*x)/((x*x+y*y)**(3/2))
+def F_4(x,y):
+    return (-MG*y)/((x*x+y*y)**(3/2))
+
+def Runge(x,y,vx,vy): #does the Runge-Kutta Method
+    x_pts = []
+    y_pts = []
+    vx_pts = []
+    vy_pts = []
+    for k in t_pts:
+        x_pts.append (x)
+        y_pts.append (y)
+        vx_pts.append (vx)
+        vy_pts.append (vy)
+        
+        k1 = h*F_1(vx)
+        l1 = h*F_2(vy)
+        m1 = h*F_3(x,y)
+        n1 = h*F_4(x,y)
+        
+        k2 = h*F_1(vx+m1/2)
+        l2 = h*F_2(vy+n1/2)
+        m2 = h*F_3(x+k1/2,y+l1/2)
+        n2 = h*F_4(x+k1/2,y+l1/2)
+        
+        k3 = h*F_1(vx+m2/2)
+        l3 = h*F_2(vy+n2/2)
+        m3 = h*F_3(x+k2/2,y+l2/2)
+        n3 = h*F_4(x+k2/2,y+l2/2)
+        
+        k4 = h*F_1(vx+m3)
+        l4 = h*F_2(vy+n3)
+        m4 = h*F_3(x+k3,y+l3)
+        n4 = h*F_4(x+k3,y+l3)
+        
+        x+= (k1+2*k2+2*k3+k4)/6
+        y+= (l1+2*l2+2*l3+l4)/6
+        vx+= (m1+2*m2+2*m3+m4)/6
+        vy+= (n1+2*n2+2*n3+n4)/6
+        
+    return np.array(x_pts),np.array(y_pts),np.array(vx_pts),np.array(vy_pts)
+
+x,y,vx,vy = Runge(1,0,0,2*pi)
+
+py.plot(x,y) #plots the orbit
+py.show()

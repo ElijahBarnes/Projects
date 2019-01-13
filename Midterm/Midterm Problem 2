@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 24 11:12:51 2017
+
+@author: elijahbarnes
+"""
+
+import numpy as np
+import pylab as py
+
+alt = np.loadtxt('altitude.txt')
+h = 30000
+(Y,X) = np.shape(alt)
+Dx = np.empty([Y,X],float)
+Dy = np.empty([Y,X],float)
+Intensity = np.empty([Y,X],float)
+pi = np.pi
+def Derx(x,y): # x derivative
+    Derx = (alt[y][x+1]-alt[y][x])
+    return Derx/h
+
+def Dery(x,y): # y derivative
+    Dery = (alt[y+1][x]-alt[y][x])
+    return Dery/h
+
+def I(phi,Derx,Dery):
+    return (np.cos(phi)*Derx + np.sin(phi)*Dery)/((Derx*Derx + Dery*Dery + 1)**(1/2))
+
+for i in range(Y-1):
+    for j in range(X-1):
+        Dx[i][j] = Derx(j,i)
+        Dy[i][j] = Dery(j,i)
+
+# Intensity Array and Density Plot
+for i in range(Y-1):
+    for j in range(X-1):
+        Intensity[i,j] = I(pi/4,Dx[i][j],Dy[i][j])
+# If plot doesn't show map, restart kernel
+py.imshow(Intensity)
+py.bone()
+py.show()
+        
+        
+

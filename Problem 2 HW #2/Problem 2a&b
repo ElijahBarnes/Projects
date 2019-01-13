@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct  2 10:04:08 2017
+
+@author: elijahbarnes
+"""
+
+import numpy as np
+
+Epsilon = 8.854187817e-12
+print ("Please input your x variable ")
+x = int(input())
+print ("Please input your y variable ")
+y = int(input())
+print ("Please input your z variable ")
+z = int(input())
+
+def V(a):
+    return (1/(4*np.pi*Epsilon))*(5*np.sin(a)**(2) + 4)**(.5)/(((x-3*np.cos(a))**(2)+(y-2*np.sin(a))**(2)+(z**(2)))**(.5))
+
+def E(a):
+    return (1/(4*np.pi*Epsilon))*(((x-3*np.cos(a))**(2)+(y-2*np.sin(a))**(2)+(z**(2))*(5*np.sin(a)**(2) + 4)**(.5))/(((x-3*np.cos(a))**(2)+(y-2*np.sin(a))**(2)+(z**(2)))**(3/2)))
+
+def SimpV(a,b,h):
+    S1 = 0
+    S2 = 0
+    N = int((b-a)/h)
+    
+    for k in range (1,N,2):
+        S1 = V(a+k*h) + S1
+
+    for n in range (2,N,2):
+        S2 = V(a+n*h) + S2
+        
+    return h/3*(V(a)+V(b)+ 4*S1 + 2*S2)
+
+def SimpE(a,b,h):
+    S1 = 0
+    S2 = 0
+    N = int((b-a)/h)
+    
+    for k in range (1,N,2):
+        S1 = E(a+k*h) + S1
+
+    for n in range (2,N,2):
+        S2 = E(a+n*h) + S2
+        
+    return h/3*(V(a)+V(b)+ 4*S1 + 2*S2)
+
+Verror = (.1**(4))*SimpV(0,2*np.pi,.1)
+Eerror = (.1**(4))*SimpE(0,2*np.pi,.1)
+print (SimpV(0,2*np.pi,.1)," is the Potential")
+print (SimpE(0,2*np.pi,.1)," is the Norm of the Electric Field")

@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 23 16:54:15 2017
+
+@author: elijahbarnes
+"""
+import numpy as np
+import pylab as py
+
+
+I = 1
+pi = np.pi
+
+#Part 1
+
+def Bx(x,y,z,theta): #x component
+    return I*((5*np.sin(theta)*np.sin(theta)+4)**(1/2))*z*2*np.cos(theta)/(((((x-3*np.cos(theta))**2)+(y-2*np.sin(theta))**2)+z*z)**(3/2))
+def By(x,y,z,theta): #y component
+    return I*((5*np.sin(theta)*np.sin(theta)+4)**(1/2))*z*3*np.sin(theta)/(((((x-3*np.cos(theta))**2)+(y-2*np.sin(theta))**2)+z*z)**(3/2))
+def Bz(x,y,z,theta): #z component
+    return I*(((5*np.sin(theta)*np.sin(theta)+4)**(1/2))*(-3*np.sin(theta)*(y-2*np.sin(theta))-2*np.cos(theta)*(x-3*np.cos(theta))))/((((x-3*np.cos(theta))**2)+(y-2*np.sin(theta))**2+z*z)**(3/2))
+
+#Part 2
+
+def Sx(x,y,z): #Simpson for x component
+
+    S = Bx(x,y,z,0)+Bx(x,y,z,2*pi)
+    h = .1
+    N = len(np.arange(0,2*pi,h))
+    for k in range (1,N,2):
+        S+= 4*Bx(x,y,z,0+k*h) 
+
+    for k in range (2,N-1,2):
+        S+= 2*Bx(x,y,z,0+k*h) 
+        
+    return (h/3)*S
+def Sy(x,y,z): #Simpson for y component
+
+    S = By(x,y,z,0)+By(x,y,z,2*pi)
+    h = .1
+    N = len(np.arange(0,2*pi,h))
+    for k in range (1,N,2):
+        S+= 4*By(x,y,z,0+k*h) 
+
+    for k in range (2,N-1,2):
+        S+= 2*By(x,y,z,0+k*h) 
+        
+    return (h/3)*S
+def Sz(x,y,z):#Simspon for z component
+
+    S = Bz(x,y,z,0)+Bz(x,y,z,2*pi)
+    h = .1
+    N = len(np.arange(0,2*pi,h))
+    for k in range (1,N,2):
+        S+= 4*Bz(x,y,z,0+k*h) 
+
+    for k in range (2,N-1,2):
+        S+= 2*Bz(x,y,z,0+k*h) 
+        
+    return (h/3)*S
+
+print ("The Magnetic Field is <",Sx(1,4,7),",",Sy(1,4,7),",",Sz(1,4,7),"> at (1,4,7)")
+
+def MagB(x,y,z):#Magnitude of B
+    return (Sx(x,y,z)**2 + Sy(x,y,z)**2 + Sz(x,y,z)**2)**(1/2)
+
+
+#Part3
+
+def Trapx(x,y,z):#Trapezoid Rule for x component
+    h = .1
+    N = len(np.arange(0,2*pi,h))
+    S_1 = 0
+    Delta = 1e-6
+    Epsilon = 1
+    I_1 = 0
+    I_2 = 0
+    S_2 = 0
+    
+    for k in range (1,N,1):
+            S_1+= Bx(x,y,z,0+k*h)
+            
+    I_1 = h*(Bx(x,y,z,0)/2 + Bx(x,y,z,2*pi)/2 + S_1)
+            
+    while Epsilon > Delta:
+        h= h/2
+        N= 2*N
+        for k in range (1,N,2):
+            S_2+= Bx(x,y,z,0+k*h)
+                    
+        I_2 = I_1/2 + h*S_2
+        Epsilon = (I_2-I_1)/3
+        I_1 = I_2
+                    
+    return (I_1)
+
+def Trapy(x,y,z):#Trapezoid Rule for y component
+    h = .1
+    N = len(np.arange(0,2*pi,h))
+    S_1 = 0
+    Delta = 1e-6
+    Epsilon = 1
+    I_1 = 0
+    I_2 = 0
+    S_2 = 0
+    for k in range (1,N,1):
+            S_1+= By(x,y,z,0+k*h)
+            
+    I_1 = h*(By(x,y,z,0)/2 + By(x,y,z,2*pi)/2 + S_1)
+            
+    while Epsilon > Delta:
+        h= h/2
+        N= 2*N
+        for k in range (1,N,2):
+            S_2+= By(x,y,z,0+k*h)
+                    
+        I_2 = I_1/2 + h*S_2
+        Epsilon = (I_2-I_1)/3
+        I_1 = I_2
+                    
+    return (I_1)
+
+def Trapz(x,y,z):#Trapezoid Rule for z component
+    h = .2
+    N = len(np.arange(0,2*pi,h))
+    S_1 = 0
+    Delta = 1e-6
+    Epsilon = 1
+    I_1 = 0
+    I_2 = 0
+    S_2 = 0
+    for k in range (1,N,1):
+            S_1+= Bz(x,y,z,0+k*h)
+            
+    I_1 = h*(Bz(x,y,z,0)/2 + Bz(x,y,z,2*pi)/2 + S_1)
+            
+    while Epsilon > Delta:
+        h= h/2
+        N= 2*N
+        for k in range (1,N,2):
+            S_2+= Bz(x,y,z,0+k*h)
+                    
+        I_2 = I_1/2 + h*S_2
+        Epsilon = (I_2-I_1)/3
+        I_1 = I_2
+                    
+    return (I_1)
+
+print ("The Magnetic Field at is <", Trapx(1,2,5),",",Trapy(1,2,5),",",Trapz(1,2,5),"> at (1,2,5)")
+ # Part 4
+x = np.arange (-5,5,.1)
+y = np.arange (-5,5,.1)
+z = 1
+a = 0
+b = 0
+L = len(x)
+T = np.empty([L,L],float)
+t = np.arange(0,2*pi,.1)
+for a in range(L):
+    for b in range(L):
+       T[a,b] = MagB(x[a],y[b],z)
+       b+=1
+    a+=1
+    
+py.imshow(T,extent=[-5,5,-5,5])
+py.spectral ()
+py.show()

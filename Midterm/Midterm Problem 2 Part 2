@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 24 13:40:09 2017
+
+@author: elijahbarnes
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 24 11:12:51 2017
+
+@author: elijahbarnes
+"""
+
+import numpy as np
+import pylab as py
+
+stm = np.loadtxt('stm.txt')
+h = 2.5
+(Y,X) = np.shape(stm)
+Dx = np.empty([Y,X],float)
+Dy = np.empty([Y,X],float)
+Intensity = np.empty([Y,X],float)
+pi = np.pi
+def Derx(x,y): # x derivative
+    Derx = (stm[y][x+1]-stm[y][x])
+    return Derx/h
+
+def Dery(x,y): # y derivative
+    Dery = (stm[y+1][x]-stm[y][x])
+    return Dery/h
+
+def I(phi,Derx,Dery):
+    return - (np.cos(phi)*Derx + np.sin(phi)*Dery)/((Derx*Derx + Dery*Dery + 1)**(1/2))
+
+for i in range(Y-1):
+    for j in range(X-1):
+        Dx[i][j] = Derx(j,i)
+        Dy[i][j] = Dery(j,i)
+
+# Intensity Array and Density Plot
+for i in range(Y-1):
+    for j in range(X-1):
+        Intensity[i,j] = I(pi/4,Dx[i][j],Dy[i][j])
+
+py.imshow(Intensity)
+py.spectral()
+py.show()
+        
+        
+

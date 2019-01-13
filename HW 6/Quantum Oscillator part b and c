@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Nov 17 08:39:57 2017
+
+@author: elijahbarnes
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Nov 14 17:26:44 2017
+
+@author: elijahbarnes
+"""
+
+import numpy as np
+import pylab as py
+
+N = 100
+m = 9.1094e-31
+h_bar = 1.0546e-34
+e = 1.6022e-19
+V_0 = 50*e
+a = 1e-11
+h = 20 * (a/N)
+
+def V(x):
+    return V_0*x*x*x*x/(a*a*a*a)
+
+def f(r,x,E):
+    Phi = r[1]
+    Psi = r[0]
+    fPhi = (V(x)-E)*Psi*2*m/(h_bar*h_bar) 
+    fPsi = Phi
+    return np.array([fPsi,fPhi],float)
+
+def Runge(E):
+    a = 1
+    b = 0
+    r = np.array([a,b],float)
+    
+    for x in np.arange(-10*a,10*a,h):
+        
+        k_1 = h*f(r,x,E)
+        k_2 = h*f(r+k_1/2,x+h/2,E)
+        k_3 = h*f(r+k_2/2,x+h/2,E)
+        k_4 = h*f(r+k_3,x+h,E)
+        r += (k_1+2*k_2+2*k_3+k_4)/6
+        
+    return r[0]
+
+def Sec(E_1,E_2):
+    Psi_2 = Runge(E_1)
+    star = e/1000
+    
+    while abs(E_1 - E_2) > star:
+        Psi_1,Psi_2 = Psi_2, Runge(E_2)
+        E_1,E_2 = E_2,E_2 - Psi_2*(E_2-E_1)/(Psi_2-Psi_1)
+    return E_2
+    
+initial = Sec(0,e)
+guess_1 = Sec(350*e,550*e)
+guess_2 = Sec(100*e,400*e)
+
+print ("E_0  =", (1/e)*initial,"eV")
+print ("E_1  =", (1/e)*guess_1,"eV")
+print ("E_2  =", (1/e)*guess_2,"eV")
+
+def RungeWave(E):
+    a = 1
+    b = 0
+    r = np.array([a,b],float)
+    Psi_pts = []
+    for x in np.arange(-10*a,10*a,h):
+        
+        k_1 = h*f(r,x,E)
+        k_2 = h*f(r+k_1/2,x+h/2,E)
+        k_3 = h*f(r+k_2/2,x+h/2,E)
+        k_4 = h*f(r+k_3,x+h,E)
+        r += (k_1+2*k_2+2*k_3+k_4)/6
+        Psi_pts.append (r[0])
+    return np.array(Psi_pts)
+
+x = np.arange(-10*a,10*a,h)
+Wave_1 = RungeWave(initial)**2
+Wave_2 = RungeWave(guess_1)**2
+Wave_3 = RungeWave(guess_2)**2    
+
+def normalize(Wave):
+    I = Wave[0] + Wave[300]
+    for k in range(0,300):
+        if k%2==0:
+            I += 4*Wave[k]
+        else:
+            I += 2*Wave[k]
+        return (2/3)(h*I)
+    
+A_1 = 1/normalize(Wave_1)
+A_2 = 1/normalize(Wave_2)
+A_3 = 1/normalize(Wave_3)
+
+py.plot(x[0:800],A_1*Wave_1[0:800]) 
+py.plot(x[0:800],A_2*Wave_2[0:800])
+py.plot(x[0:800],A_3*Wave_3[0:800])
+py.show
+        
+            
