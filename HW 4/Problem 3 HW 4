@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Oct 20 08:36:07 2017
+
+@author: elijahbarnes
+"""
+
+import numpy as np
+import numpy.linalg as npl
+
+V = 5
+R_1 = 1000
+R_2 = 4000
+R_3 = 3000
+R_4 = 2000
+I0 = 3e-9
+V_T = .05
+
+def Kirk(V1,V2):
+    return np.array([[(V1-V)/R_1 + V1/R_2 + I0*(np.exp((V1-V2)/V_T) - 1)],[(V1-V)/R_3 + V2/R_4 + I0*(np.exp((V2-V1)/V_T)-1)]])
+def Der1(V1,V2):
+    return 1/R_1 + 1/R_2 + I0*np.exp((V1-V2)/V_T)/V_T
+def Der2(V1,V2):
+    return -I0*np.exp((V1-V2)/V_T)/V_T
+def Der3(V1,V2):
+    return -I0*np.exp((V2-V1)/V_T)/V_T
+def Der4(V1,V2):
+    return 1/R_3 + 1/R_4 + I0*np.exp((V2-V1)/V_T)/V_T
+def M(V1,V2):
+    return np.array([[Der1(V1,V2),Der2(V1,V2)],[Der3(V1,V2),Der4(V1,V2)]])
+
+V_0 = np.array([[1],[.5]])
+error = 1
+delta = 1e-9
+
+while error > delta:
+    V_Final = V_0 - np.dot((npl.inv(M(V_0[0,0],V_0[1,0]))),Kirk(V_0[0,0],V_0[1,0]))
+    error = npl.norm((V_Final-V_0)/npl.norm(V_0))
+    V_0 = V_Final
+
+V1 = V_Final[0,0]
+V2 = V_Final[1,0]
+
+print (V1-V2)
