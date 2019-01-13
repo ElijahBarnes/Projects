@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 10 13:18:18 2017
+
+@author: elijahbarnes
+"""
+
+import numpy as np
+import pylab as py
+G = 6.674e-11
+Sigma = 100
+L = 10
+h=.1
+a_x = -L/2
+b_x = L/2
+a_y = -L/2
+b_y = L/2
+N = int((b_x - a_x)/h)
+F = []
+
+def f(x,y):
+    return (1/(x**2 + y**2 + z**2))**(3/2)
+
+def Trap2(z):
+    for k in range (1,N):
+        Initial = f(a_x,a_y)+f(b_x,a_y)+f(a_x,b_y)+f(b_x,b_y)
+        Initial+=2*(f(a_x+k*h,b_x)+f(a_x+k*h,b_y)+f(a_x,b_x+k*h)+f(a_y,b_x+k*h))
+    for k in range (1,N):
+        for q in range (1,N):
+            Initial+=4*(f(a_x+k*h,a_y+q*h))
+    return Initial
+
+for z in np.arange(.1,10,.1):
+    F_z = G*Sigma*z*(h**(2))*Trap2(z)/4
+    F.append (F_z)
+             
+    
+Z = np.arange(.1,10,.1)
+py.plot(Z,F)
+ 
+

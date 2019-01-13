@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Oct 12 10:10:58 2017
+
+@author: elijahbarnes
+"""
+
+import numpy as np
+import pylab as pl
+
+data = np.loadtxt('data1.txt')
+Temp = data[0]
+Energy = data [5]
+L = len(Temp)
+h = .1
+Capacity = np.empty(L,float)
+
+def DTemp(x):
+    return (Energy[x+1]-Energy[x])/(Temp[x+1]-Temp[x])
+for x in range (0,L-2):
+    Capacity[x] = DTemp(x)
+    
+Capacity_max = max(Capacity)
+Temp_max = float(Temp[np.argwhere(Capacity_max)])
+pl.plot(Temp,Capacity)
+pl.show()
+
+print("The maximum Capacity is",Capacity_max)
+print("This occurs at a Temperature of",Temp_max)
+

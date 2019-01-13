@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 10 14:31:41 2017
+
+@author: elijahbarnes with help from Evan Davidson and Max Levin
+"""
+
+import numpy as np
+import pylab as pl
+E_dir = np.zeros([100,100],float)
+E_mag = np.zeros([100,100],float)
+q = 1
+pi = np.pi
+Epsilon = 8.85e-12
+
+def V(x,y):
+    return (q/(4*pi*Epsilon))*(q/((x+5)**(2)+(y**(2))) - q/((x-5)**(2)+(y**(2))))
+           
+def dxV(x,y):
+    return -(q/(4*pi*Epsilon))*((x+5)/(((x+5)**(2)+y**2)**(3/2))-(x-5)/(((x-5)**(2)+y**2)**(3/2)))
+
+def dyV(x,y):
+    return -(q/(4*pi*Epsilon))*((y/(((x+5)**(2)+y**2)**(3/2)))-y/(((x-5)**(2)+y**2)**(3/2)))
+
+for x in range (-50,50):
+    for y in range(-50,50):
+        if (x-5)**(2)+y**2 == 0 or (x+5)**(2)+y**2 == 0:
+            continue
+        E_mag[x+50,y+50]=(dxV(x,y)**(2)+dyV(x,y)**(2))**(1/2)
+        E_dir[x+50,y+50]=np.arctan(np.abs(dyV(x,y))/np.abs(dxV(x,y)))
+        
+        
+pl.imshow(E_mag,origin="lower",extent = [0,100,0,100])
+pl.figure()
+pl.imshow(E_dir,origin="lower",extent = [0,100,0,100])
+

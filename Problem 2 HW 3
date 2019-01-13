@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 10 13:19:49 2017
+
+@author: elijahbarnes
+"""
+import numpy as np
+import pylab as pl
+M = np.zeros([100,100],float)
+q = 1
+pi = np.pi
+Epsilon = 1
+def V(x,y):
+    return (1/(4*pi*Epsilon))*(q/((x+5)**(2)+(y**(2))) - q/((x-5)**(2)+(y**(2))))
+        
+for x in range (-50,50):
+    for y in range(-50,50):
+        if (x-5)**(2)+y**2 == 0 or (x+5)**(2)+y**2 == 0:
+            continue
+        M[x+50,y+50]=V(x,y)
+pl.imshow(M,origin="lower",extent = [0,100,0,100])
+pl.hsv()
+pl.show()

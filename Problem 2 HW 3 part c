@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct 11 15:46:03 2017
+
+@author: elijahbarnes
+"""
+
+import numpy as np
+import pylab as pl
+
+V_matrix = np.zeros([100,100],float)
+E_mag = np.zeros([100,100],float)
+h = .1
+N = int(10/h)
+Epsilon = 8.85e-12
+def f(z,w):
+    return np.sin(2*np.pi*z/10)*np.sin(2*np.pi*w/10)/(((x-z-h/1000)**(2)+(y-w-h/1000)**(2))**(1/2))
+def V(x,y):
+    for k in range (1,N):
+        Initial = f(-5,5)+f(5,5)+f(-5,5)+f(-5,5)
+        Initial+=2*(f(-5+k*h,-5)+f(-5+k*h,5)+f(-5,-5+k*h)+f(5,-5+k*h))
+    for k in range (1,N):
+        for q in range (1,N):
+            Initial+=4*(f(-5+k*h,5+q*h))
+    return -Initial/(4*np.pi*Epsilon)
+for x in range (-50,50):
+    for y in range (-50,50):
+        if y<50 and x<50:
+            E_mag[x+50,y+50]=(((V(x+1,y)-V(x,y))/.1)**(2)+(V(x,y+1)-V(x,y))**(2))**(1/2)
+pl.imshow(E_mag,origin="lower",extent = [0,100,0,100])
